@@ -15,6 +15,7 @@ const PrivateRouting = () => {
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/products" element={<Products />} />
                     <Route path="/cart" element={<Cart />} />
+                    <Route path="*" element={<Navigate to="/products" replace />} />
                 </Routes>
             </CartProvider>
         </BrowserRouter>

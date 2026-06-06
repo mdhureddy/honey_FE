@@ -7,6 +7,14 @@ import multiFlowerImg3 from '../Assets/MultiFloer/img3.png';
 import jamunHoneyImg1 from '../Assets/JamunHoney/img1.png'
 import jamunHoneyImg2 from '../Assets/JamunHoney/img2.png'
 import jamunHoneyImg3 from '../Assets/JamunHoney/img3.png'
+
+
+import gingerHoney1 from '../Assets/GingerHoney/img1.jpeg'
+import gingerHoney2 from '../Assets/GingerHoney/img2.png'
+import gingerHoney3 from '../Assets/GingerHoney/img3.png'
+
+import neemHoney1 from '../Assets/NeemHoney/img1.png'
+
 export const items=[
     {
         "Multi Flower":[
@@ -65,7 +73,7 @@ export const items=[
                 // discount:30,
                 tags:['Raw Honey','Unprocessed','Pure'],
                 benefits:['Good for sugar (diabetes) patients and obesity','Helps relieve cold-related problems and allergies','Prevents blood clotting problems'],
-                images:[],
+                images:[neemHoney1],
 
             },
             {
@@ -77,7 +85,7 @@ export const items=[
                 // discount:30,
                 tags:['Raw Honey','Unprocessed','Pure'],
                 benefits:['Good for sugar (diabetes) patients and obesity','Helps relieve cold-related problems and allergies','Prevents blood clotting problems'],
-                images:[],
+                images:[neemHoney1],
 
             }
         ]
@@ -91,7 +99,7 @@ export const items=[
                 final_price:349,
                 tags:['Pure Natural','RAW',"Unprocessed"],
                 benefits:['Helps Reduce joint pain','Body pain','Throat Infection','Chest Congestion','Helps in Reducing Body weight','Useful for Acidity,Gas, and Indigestion Problems','Helps Relieve Vomiting and Constipation Problems'],
-                images:[],
+                images:[gingerHoney1,gingerHoney2,gingerHoney3],
 
             },{
                 id:2,
@@ -100,7 +108,7 @@ export const items=[
                 final_price:689,
                 tags:['Pure Natural','RAW',"Unprocessed"],
                 benefits:['Helps Reduce joint pain','Body pain','Throat Infection','Chest Congestion','Helps in Reducing Body weight','Useful for Acidity,Gas, and Indigestion Problems','Helps Relieve Vomiting and Constipation Problems'],
-                images:[],
+                images:[gingerHoney1,gingerHoney2,gingerHoney3],
 
             }
         ]
