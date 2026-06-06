@@ -1,13 +1,31 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { items } from '../Data/ProductItems';
 import { useCart } from '../context/CartContext';
 import AddressModal from './AddressModal';
+
+const AUTO_SCROLL_INTERVAL = 3000;
 
 const ImageCarousel = ({ images, name }) => {
     const [current, setCurrent]   = useState(0);
     const [zoomed, setZoomed]     = useState(false);
     const [origin, setOrigin]     = useState({ x: 50, y: 50 });
     const containerRef            = useRef(null);
+    const touchStartX             = useRef(null);
+    const autoTimerRef            = useRef(null);
+
+    const goNext = useCallback(() => setCurrent((c) => (c + 1) % images.length), [images.length]);
+    const goPrev = useCallback(() => setCurrent((c) => (c - 1 + images.length) % images.length), [images.length]);
+
+    const resetAutoScroll = useCallback(() => {
+        clearInterval(autoTimerRef.current);
+        autoTimerRef.current = setInterval(goNext, AUTO_SCROLL_INTERVAL);
+    }, [goNext]);
+
+    useEffect(() => {
+        if (images.length <= 1) return;
+        autoTimerRef.current = setInterval(goNext, AUTO_SCROLL_INTERVAL);
+        return () => clearInterval(autoTimerRef.current);
+    }, [images.length, goNext]);
 
     const handleMouseMove = (e) => {
         if (!containerRef.current) return;
@@ -18,8 +36,19 @@ const ImageCarousel = ({ images, name }) => {
         });
     };
 
-    const prev = (e) => { e.stopPropagation(); setCurrent((c) => (c - 1 + images.length) % images.length); };
-    const next = (e) => { e.stopPropagation(); setCurrent((c) => (c + 1) % images.length); };
+    const prev = (e) => { e.stopPropagation(); goPrev(); resetAutoScroll(); };
+    const next = (e) => { e.stopPropagation(); goNext(); resetAutoScroll(); };
+
+    const onTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
+    const onTouchEnd = (e) => {
+        if (touchStartX.current === null) return;
+        const diff = touchStartX.current - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 40) {
+            diff > 0 ? goNext() : goPrev();
+            resetAutoScroll();
+        }
+        touchStartX.current = null;
+    };
 
     if (images.length === 0) {
         return (
@@ -38,7 +67,9 @@ const ImageCarousel = ({ images, name }) => {
             onMouseEnter={() => setZoomed(true)}
             onMouseLeave={() => setZoomed(false)}
             onMouseMove={handleMouseMove}
-            className="relative w-full h-72 bg-gradient-to-b from-amber-50 via-yellow-50 to-amber-100 overflow-hidden group cursor-zoom-in flex items-center justify-center"
+            onTouchStart={onTouchStart}
+            onTouchEnd={onTouchEnd}
+            className="relative w-full h-72 bg-gradient-to-b from-amber-50 via-yellow-50 to-amber-100 overflow-hidden group cursor-zoom-in flex items-center justify-center select-none"
         >
             <img
                 key={current}
@@ -52,9 +83,9 @@ const ImageCarousel = ({ images, name }) => {
                 draggable={false}
             />
 
-            {/* Zoom hint */}
+            {/* Zoom hint — desktop only */}
             {!zoomed && (
-                <span className="absolute bottom-3 left-3 bg-black/30 text-white text-xs px-2 py-0.5 rounded-full pointer-events-none">
+                <span className="hidden sm:inline absolute bottom-3 left-3 bg-black/30 text-white text-xs px-2 py-0.5 rounded-full pointer-events-none">
                     🔍 Hover to zoom
                 </span>
             )}
@@ -66,7 +97,7 @@ const ImageCarousel = ({ images, name }) => {
                         onClick={prev}
                         onMouseEnter={() => setZoomed(false)}
                         onMouseLeave={() => setZoomed(true)}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-amber-700 rounded-full w-9 h-9 flex items-center justify-center shadow-md text-xl font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                        className="absolute left-3 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-amber-700 rounded-full w-9 h-9 flex items-center justify-center shadow-md text-xl font-bold opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200"
                     >
                         ‹
                     </button>
@@ -74,7 +105,7 @@ const ImageCarousel = ({ images, name }) => {
                         onClick={next}
                         onMouseEnter={() => setZoomed(false)}
                         onMouseLeave={() => setZoomed(true)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-amber-700 rounded-full w-9 h-9 flex items-center justify-center shadow-md text-xl font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white text-amber-700 rounded-full w-9 h-9 flex items-center justify-center shadow-md text-xl font-bold opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200"
                     >
                         ›
                     </button>
@@ -84,7 +115,7 @@ const ImageCarousel = ({ images, name }) => {
                         {images.map((_, i) => (
                             <button
                                 key={i}
-                                onClick={() => setCurrent(i)}
+                                onClick={(e) => { e.stopPropagation(); setCurrent(i); resetAutoScroll(); }}
                                 onMouseEnter={() => setZoomed(false)}
                                 onMouseLeave={() => setZoomed(true)}
                                 className={`rounded-full transition-all duration-200 ${i === current ? 'bg-amber-500 w-4 h-2' : 'bg-amber-300 w-2 h-2'}`}
